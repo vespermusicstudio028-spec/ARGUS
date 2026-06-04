@@ -44,6 +44,10 @@ if ($currentRemote -ne $expectedRemote) {
     Write-Host " -> Vinculado ao repositório: $expectedRemote" -ForegroundColor Gray
 }
 
+# Tenta sincronizar o histórico remoto antes de enviar
+Write-Host " -> Sincronizando com o repositório remoto..." -ForegroundColor Gray
+git pull origin main --allow-unrelated-histories -X ours --no-edit 2>$null
+
 git add .
 $gitChanges = git status --porcelain
 if ($gitChanges) {
@@ -53,17 +57,17 @@ if ($gitChanges) {
     git push -u origin main
     Write-Host " -> GitHub atualizado com sucesso!" -ForegroundColor Green
 } else {
-    Write-Host " -> Nenhuma alteração pendente para enviar ao GitHub." -ForegroundColor Gray
+    # Tenta dar push caso o commit já tenha sido feito localmente mas o push tenha falhado antes
+    Write-Host " -> Enviando atualizações pendentes..." -ForegroundColor Gray
+    git push -u origin main 2>$null
+    Write-Host " -> GitHub atualizado!" -ForegroundColor Green
 }
 
 # 4. Atualizar o Vercel (argus-one-kappa.vercel.app)
 Write-Host "[3/5] Implantando atualizações no Vercel..." -ForegroundColor Yellow
-if (-not (Test-Path ".vercel")) {
-    Write-Host " -> Configurando/Linkando projeto no Vercel pela primeira vez..." -ForegroundColor Gray
-}
 
-# Executa o deploy de produção
-npx vercel --prod --yes
+# Executa o deploy de produção forçando o nome correto em letras minúsculas (argus-one-kappa)
+npx vercel --name argus-one-kappa --prod --yes
 if ($LASTEXITCODE -eq 0) {
     Write-Host " -> Deploy de produção no Vercel concluído!" -ForegroundColor Green
 } else {
@@ -71,7 +75,7 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 # 5. Iniciar o servidor local em uma nova janela
-Write-Host "[4/5] Iniciando o servidor local..." -ForegroundColor Yellow
+Write-Host "[4/5] Iniciar o servidor local..." -ForegroundColor Yellow
 Start-Process cmd.exe -ArgumentList "/k npm run dev" -WorkingDirectory $projectDir -WindowStyle Normal
 Write-Host " -> Servidor local carregando (3 segundos)..." -ForegroundColor Gray
 Start-Sleep -Seconds 3
