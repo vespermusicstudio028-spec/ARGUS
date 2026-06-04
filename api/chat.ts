@@ -1,15 +1,5 @@
-import express from "express";
-import path from "path";
-import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const app = express();
-const PORT = 3001;
-
-app.use(express.json());
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { GoogleGenAI } from '@google/genai';
 
 // Initialize Gemini
 const ai = new GoogleGenAI({
@@ -21,11 +11,15 @@ const ai = new GoogleGenAI({
   }
 });
 
-// We'll keep the chat sessions in memory for simplicity
-// In a production app, use a database and tie it to a reliable session ID
+// In-memory chat sessions (note: these reset on cold starts in serverless)
 const chatSessions: Record<string, any> = {};
 
-app.post("/api/chat", async (req, res) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Only allow POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
     const { message, sessionId = "default", language = "pt-BR" } = req.body;
 
@@ -63,37 +57,4 @@ app.post("/api/chat", async (req, res) => {
     console.error("Gemini API Error:", error);
     res.status(500).json({ error: error.message });
   }
-});
-
-app.post("/api/chat/reset", (req, res) => {
-  const { sessionId = "default" } = req.body;
-  delete chatSessions[sessionId];
-  res.json({ success: true });
-});
-
-async function startServer() {
-  if (!process.env.VERCEL) {
-    // Vite middleware for development
-    if (process.env.NODE_ENV !== "production") {
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: "spa",
-      });
-      app.use(vite.middlewares);
-    } else {
-      const distPath = path.join(process.cwd(), "dist");
-      app.use(express.static(distPath));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(distPath, "index.html"));
-      });
-    }
-
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  }
 }
-
-startServer();
-
-export default app;
