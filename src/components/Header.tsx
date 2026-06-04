@@ -1,4 +1,4 @@
-import { Settings, X, Cpu, Globe, History } from 'lucide-react';
+import { Settings, X, Globe, History } from 'lucide-react';
 import React from 'react';
 import { ArgusLanguage, UI_TRANSLATIONS } from '../types';
 import { BatteryIndicator } from './BatteryIndicator';
@@ -25,15 +25,15 @@ export function Header({ status, currentLanguage, onLanguageChange, onReset, onH
       <div className="flex items-center gap-4">
         <div className="relative flex items-center justify-center w-12 h-12 bg-black rounded-full border border-cyan-500/30 overflow-hidden hud-border-cyan group">
           <div className="absolute inset-0 border-t-2 border-cyan-400 rounded-full animate-[spin_3s_linear_infinite]" />
-          <Cpu className="text-cyan-400 w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+          <img src="/argus-logo.png" alt="ARGUS Logo" className="w-8 h-8 object-contain relative z-10 group-hover:scale-110 transition-transform duration-300" />
         </div>
         <div className="hidden sm:block">
           <h1 className="text-cyan-400 font-bold tracking-[0.2em] text-lg lg:text-xl flex items-center gap-2">
-            ARGUS <span className="text-xs text-cyan-400/50 mt-1">v1.0</span>
+            ARGUS <span className="text-cyan-300/70 font-medium tracking-[0.15em]">IA</span> <span className="text-xs text-cyan-400/50 mt-1">v1.0</span>
           </h1>
           <div className="flex items-center gap-2 text-xs font-mono mt-1">
             <span className="w-2 h-2 rounded-full bg-cyan-glow animate-pulse"></span>
-            <span className="text-gray-400 tracking-wider">SISTEMA ONLINE</span>
+            <span className="text-gray-400 tracking-wider italic">Vigilância Total. Controle Absoluto.</span>
           </div>
         </div>
         
