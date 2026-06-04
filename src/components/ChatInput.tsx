@@ -1,6 +1,6 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { Paperclip, Mic, Send } from 'lucide-react';
-import React, { useState } from 'react';
-
+ 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   status: string;
@@ -11,16 +11,24 @@ interface ChatInputProps {
 export function ChatInput({ onSendMessage, status, isMicActive, onToggleMic }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const isBusy = status === 'processing' || status === 'analyzing';
+
+  // Automatically keep focus on the textarea whenever the system becomes idle
+  useEffect(() => {
+    if (!isBusy && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isBusy]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && status !== 'processing' && status !== 'analyzing') {
+    if (message.trim() && !isBusy) {
       onSendMessage(message);
       setMessage('');
     }
   };
-
-  const isBusy = status === 'processing' || status === 'analyzing';
 
   return (
     <div className="w-full max-w-4xl mx-auto p-2 z-10 relative">
@@ -52,6 +60,8 @@ export function ChatInput({ onSendMessage, status, isMicActive, onToggleMic }: C
           {/* Custom Terminal Prompt Indicator */}
           <span className="text-cyan-500/50 font-mono text-sm mr-2 select-none">$&gt;</span>
           <textarea
+            ref={textareaRef}
+            autoFocus
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onFocus={() => setIsFocused(true)}
