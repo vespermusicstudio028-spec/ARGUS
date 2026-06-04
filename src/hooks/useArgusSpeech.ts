@@ -14,28 +14,6 @@ export function useArgusSpeech({ onMessageUser, onMessageAi, language = 'pt-BR' 
   const [sessionId, setSessionId] = useState<string>('');
   const [isStandby, setIsStandby] = useState(false);
   const isStandbyRef = useRef(false);
-  const standbyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Auto-standby timer
-  useEffect(() => {
-    if (standbyTimeoutRef.current) {
-      clearTimeout(standbyTimeoutRef.current);
-      standbyTimeoutRef.current = null;
-    }
-
-    if (isMicActive && !isStandby && status === 'listening' && !isInteractingRef.current) {
-      standbyTimeoutRef.current = setTimeout(() => {
-        setIsStandby(true);
-        isStandbyRef.current = true;
-      }, 10000);
-    }
-
-    return () => {
-      if (standbyTimeoutRef.current) {
-        clearTimeout(standbyTimeoutRef.current);
-      }
-    };
-  }, [isMicActive, isStandby, status]);
 
   // Initialize Session ID
   useEffect(() => {
