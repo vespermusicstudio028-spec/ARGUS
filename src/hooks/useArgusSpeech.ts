@@ -211,8 +211,9 @@ export function useArgusSpeech({ onMessageUser, onMessageAi, language = 'pt-BR' 
       }
     } else {
       const standbyKeywords = [
-        'fique quieto', 'standby', 'modo de espera', 'não fale mais', 
-        'silêncio', 'stop talking', 'be quiet', 'stand by', 'calar a boca', 'durma', 'desligar'
+        'fique quieto', 'silêncio', 'calar a boca', 'durma', 'desligar', 
+        'modo de espera', 'standby', 'descançar', 'boa noite', 'vai dormir', 
+        'tchau', 'tchau tchau', 'by', 'by by', 'stop talking', 'be quiet', 'stand by', 'não fale mais'
       ];
       
       if (standbyKeywords.some(keyword => lowerTranscript.includes(keyword))) {
