@@ -33,7 +33,7 @@ export function Header({ status, currentLanguage, onLanguageChange, onReset, onH
           </h1>
           <div className="flex items-center gap-2 text-xs font-mono mt-1">
             <span className="w-2 h-2 rounded-full bg-cyan-glow animate-pulse"></span>
-            <span className="text-gray-400 tracking-wider italic">Vigilância Total. Controle Absoluto.</span>
+            <span className="text-gray-400 tracking-wider">SISTEMA ONLINE</span>
           </div>
         </div>
         

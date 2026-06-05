@@ -2,9 +2,5 @@
   "version": 2,
   "buildCommand": "npm run build:frontend",
   "outputDirectory": "dist",
-  "framework": null,
-  "rewrites": [
-    { "source": "/api/chat/reset", "destination": "/api/chat-reset" },
-    { "source": "/api/chat", "destination": "/api/chat" }
-  ]
+  "framework": null
 }

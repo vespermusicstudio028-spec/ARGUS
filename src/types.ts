@@ -8,7 +8,7 @@ export interface Message {
 
 export const UI_TRANSLATIONS = {
   'pt-BR': {
-    howCanIHelp: 'VIGILÂNCIA TOTAL. CONTROLE ABSOLUTO.',
+    howCanIHelp: 'CONECTADA AO FUTURO',
     voiceDisabled: 'Voz Desativada',
     waitingCommand: 'Aguardando comando',
     transmitting: 'Transmitindo Resposta...',
@@ -20,7 +20,7 @@ export const UI_TRANSLATIONS = {
     standby: 'MODO DE ESPERA'
   },
   'en-GB': {
-    howCanIHelp: 'TOTAL VIGILANCE. ABSOLUTE CONTROL.',
+    howCanIHelp: 'CONNECTED TO THE FUTURE',
     voiceDisabled: 'Voice Disabled',
     waitingCommand: 'Waiting for command',
     transmitting: 'Transmitting Response...',
@@ -32,10 +32,10 @@ export const UI_TRANSLATIONS = {
     standby: 'STANDBY'
   },
   'es-ES': {
-    howCanIHelp: 'VIGILANCIA TOTAL. CONTROL ABSOLUTO.',
+    howCanIHelp: 'CONECTADA AL FUTURO',
     voiceDisabled: 'Voz desactivada',
     waitingCommand: 'Esperando comando',
-    transmitting: 'Transmitiendo respuesta...',
+    transmitting: 'Transmitiendo resposta...',
     listening: 'ESCUCHANDO',
     processing: 'PROCESANDO',
     analyzing: 'ANALIZANDO',
@@ -44,10 +44,10 @@ export const UI_TRANSLATIONS = {
     standby: 'MODO DE ESPERA'
   },
   'fr-FR': {
-    howCanIHelp: 'SURVEILLANCE TOTALE. CONTRÔLE ABSOLU.',
+    howCanIHelp: 'CONNECTÉE AU FUTUR',
     voiceDisabled: 'Voix désactivée',
     waitingCommand: 'En attente de commande',
-    transmitting: 'Transmission de réponse...',
+    transmitting: 'Transmission de resposta...',
     listening: 'ÉCOUTE',
     processing: 'TRAITEMENT',
     analyzing: 'ANALYSE',
