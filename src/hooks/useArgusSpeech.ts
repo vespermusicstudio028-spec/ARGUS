@@ -145,34 +145,113 @@ export function useArgusSpeech({ onMessageUser, onMessageAi, language = 'pt-BR' 
     }
   }, [isMicActive]);
 
-  const speak = useCallback((text: string, onEnd: () => void) => {
-    if (!synthRef.current) return;
+  // Audio context for neural voice playback
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  // Helper: convert base64 PCM16 24kHz mono to AudioBuffer
+  const pcmToAudioBuffer = useCallback((base64: string, sampleRate: number = 24000): AudioBuffer | null => {
+    try {
+      const binaryStr = atob(base64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      
+      // PCM 16-bit signed little-endian → Float32
+      const int16 = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(int16.length);
+      for (let i = 0; i < int16.length; i++) {
+        float32[i] = int16[i] / 32768.0;
+      }
+
+      if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+        audioContextRef.current = new AudioContext({ sampleRate });
+      }
+      
+      const audioBuffer = audioContextRef.current.createBuffer(1, float32.length, sampleRate);
+      audioBuffer.getChannelData(0).set(float32);
+      return audioBuffer;
+    } catch (e) {
+      console.error('PCM decode error:', e);
+      return null;
+    }
+  }, []);
+
+  // Fallback: browser speech synthesis (used when neural API fails)
+  const speakBrowserFallback = useCallback((text: string, onEnd: () => void) => {
+    if (!synthRef.current) { onEnd(); return; }
     
     synthRef.current.cancel();
-    
     const utterance = new SpeechSynthesisUtterance(text);
     if (argusVoiceRef.current) {
       utterance.voice = argusVoiceRef.current;
       utterance.lang = language;
     }
-    
-    // JARVIS tone settings: deep voice (lower pitch), slightly paced
-    const isMaleVoice = argusVoiceRef.current?.name.includes('Daniel') || argusVoiceRef.current?.name.toLowerCase().includes('male');
-    utterance.pitch = isMaleVoice ? 0.8 : 0.85; 
+    utterance.pitch = 0.85;
     utterance.rate = 1.0;
     utterance.volume = 1.0;
-
-    utterance.onend = () => {
-      onEnd();
-    };
-
-    utterance.onerror = (e) => {
-       console.error("Speech Synthesis Error:", e);
-       onEnd();
-    };
-
+    utterance.onend = () => onEnd();
+    utterance.onerror = () => onEnd();
     synthRef.current.speak(utterance);
   }, [language]);
+
+  // Primary: Neural voice via Gemini API
+  const speak = useCallback(async (text: string, onEnd: () => void) => {
+    // Stop any currently playing audio
+    if (currentSourceRef.current) {
+      try { currentSourceRef.current.stop(); } catch(e) {}
+      currentSourceRef.current = null;
+    }
+    if (synthRef.current) synthRef.current.cancel();
+
+    try {
+      const res = await fetch('/api/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, language })
+      });
+
+      if (!res.ok) throw new Error('Neural TTS API error');
+
+      const data = await res.json();
+      
+      if (!data.audio) throw new Error('No audio data received');
+
+      // Parse sample rate from mimeType (e.g. "audio/L16;rate=24000")
+      let sampleRate = 24000;
+      if (data.mimeType) {
+        const rateMatch = data.mimeType.match(/rate=(\d+)/);
+        if (rateMatch) sampleRate = parseInt(rateMatch[1]);
+      }
+
+      const audioBuffer = pcmToAudioBuffer(data.audio, sampleRate);
+      if (!audioBuffer) throw new Error('Failed to decode audio');
+
+      if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+        audioContextRef.current = new AudioContext({ sampleRate });
+      }
+      
+      // Resume context if suspended (browser autoplay policy)
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
+      const source = audioContextRef.current.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContextRef.current.destination);
+      source.onended = () => {
+        currentSourceRef.current = null;
+        onEnd();
+      };
+      currentSourceRef.current = source;
+      source.start(0);
+
+    } catch (error) {
+      console.warn('Neural TTS failed, using browser fallback:', error);
+      speakBrowserFallback(text, onEnd);
+    }
+  }, [language, pcmToAudioBuffer, speakBrowserFallback]);
 
   const handleUserSpeech = useCallback(async (transcript: string) => {
     isInteractingRef.current = true;

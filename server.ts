@@ -71,6 +71,47 @@ app.post("/api/chat/reset", (req, res) => {
   res.json({ success: true });
 });
 
+// Neural TTS endpoint using Gemini's built-in voice generation
+app.post("/api/speak", async (req, res) => {
+  try {
+    const { text, language = "pt-BR" } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: "Text is required" });
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text }] }],
+      config: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: "Charon"
+            }
+          }
+        }
+      }
+    });
+
+    const candidate = response.candidates?.[0];
+    const audioPart = candidate?.content?.parts?.find((p: any) => p.inlineData);
+
+    if (!audioPart || !audioPart.inlineData) {
+      return res.status(500).json({ error: "No audio generated" });
+    }
+
+    res.json({
+      audio: audioPart.inlineData.data,
+      mimeType: audioPart.inlineData.mimeType || "audio/L16;rate=24000"
+    });
+  } catch (error: any) {
+    console.error("TTS Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 async function startServer() {
   if (!process.env.VERCEL) {
     // Vite middleware for development
