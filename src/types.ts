@@ -8,7 +8,7 @@ export interface Message {
 
 export const UI_TRANSLATIONS = {
   'pt-BR': {
-    howCanIHelp: 'Como posso ajudar?',
+    howCanIHelp: 'VIGILÂNCIA TOTAL. CONTROLE ABSOLUTO.',
     voiceDisabled: 'Voz Desativada',
     waitingCommand: 'Aguardando comando',
     transmitting: 'Transmitindo Resposta...',
@@ -20,7 +20,7 @@ export const UI_TRANSLATIONS = {
     standby: 'MODO DE ESPERA'
   },
   'en-GB': {
-    howCanIHelp: 'How can I help?',
+    howCanIHelp: 'TOTAL VIGILANCE. ABSOLUTE CONTROL.',
     voiceDisabled: 'Voice Disabled',
     waitingCommand: 'Waiting for command',
     transmitting: 'Transmitting Response...',
@@ -32,7 +32,7 @@ export const UI_TRANSLATIONS = {
     standby: 'STANDBY'
   },
   'es-ES': {
-    howCanIHelp: '¿Cómo puedo ayudar?',
+    howCanIHelp: 'VIGILANCIA TOTAL. CONTROL ABSOLUTO.',
     voiceDisabled: 'Voz desactivada',
     waitingCommand: 'Esperando comando',
     transmitting: 'Transmitiendo respuesta...',
@@ -44,7 +44,7 @@ export const UI_TRANSLATIONS = {
     standby: 'MODO DE ESPERA'
   },
   'fr-FR': {
-    howCanIHelp: 'Comment puis-je vous aider?',
+    howCanIHelp: 'SURVEILLANCE TOTALE. CONTRÔLE ABSOLU.',
     voiceDisabled: 'Voix désactivée',
     waitingCommand: 'En attente de commande',
     transmitting: 'Transmission de réponse...',

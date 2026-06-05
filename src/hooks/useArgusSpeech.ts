@@ -189,7 +189,7 @@ export function useArgusSpeech({ onMessageUser, onMessageAi, language = 'pt-BR' 
         setIsStandby(false);
         isStandbyRef.current = false;
         
-        const wakeMsg = language.startsWith('pt') ? "Online. Como posso ajudar?" : "Online. How can I help?";
+        const wakeMsg = "Online.";
         setStatus('responding');
         speak(wakeMsg, () => {
           isInteractingRef.current = false;
