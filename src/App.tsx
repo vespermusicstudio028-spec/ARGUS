@@ -11,6 +11,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { useArgusSpeech } from './hooks/useArgusSpeech';
 import { ArgusLanguage, Message } from './types';
 import { supabase } from './lib/supabase';
+import { getSafeUUID, getSafeLocalStorage, setSafeLocalStorage } from './lib/utils';
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -23,17 +24,18 @@ export default function App() {
   const [isPlansOpen, setIsPlansOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [profileTrigger, setProfileTrigger] = useState(0); // Trigger to reload profile in panels
+  
 
   // Load message history from Supabase on init or when sessionId changes
   const [sessionId, setSessionId] = useState<string>('');
 
   useEffect(() => {
-    let savedId = localStorage.getItem('argus_session_id');
+    let savedId = getSafeLocalStorage('argus_session_id');
     if (!savedId) {
-      savedId = crypto.randomUUID();
-      localStorage.setItem('argus_session_id', savedId);
+      savedId = getSafeUUID();
+      setSafeLocalStorage('argus_session_id', savedId);
     }
-    setSessionId(savedId);
+    setSessionId(savedId || '');
   }, []);
 
   useEffect(() => {

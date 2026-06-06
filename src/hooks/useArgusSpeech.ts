@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AiStatus, ArgusLanguage } from '../types';
+import { getSafeUUID, getSafeLocalStorage, setSafeLocalStorage } from '../lib/utils';
 
 interface UseArgusSpeechProps {
   onMessageUser?: (msg: string) => void;
@@ -33,12 +34,12 @@ export function useArgusSpeech({ onMessageUser, onMessageAi, language = 'pt-BR' 
 
   // Initialize Session ID
   useEffect(() => {
-    let savedId = localStorage.getItem('argus_session_id');
+    let savedId = getSafeLocalStorage('argus_session_id');
     if (!savedId) {
-      savedId = crypto.randomUUID();
-      localStorage.setItem('argus_session_id', savedId);
+      savedId = getSafeUUID();
+      setSafeLocalStorage('argus_session_id', savedId);
     }
-    setSessionId(savedId);
+    setSessionId(savedId || '');
   }, []);
 
   // Set the correct state values when status changes
