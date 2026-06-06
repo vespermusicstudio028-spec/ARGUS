@@ -1,4 +1,4 @@
-import { Settings, X, Globe, History } from 'lucide-react';
+import { Settings, X, Globe, History, Star, Shield } from 'lucide-react';
 import React from 'react';
 import { AiStatus, ArgusLanguage, UI_TRANSLATIONS } from '../types';
 import { BatteryIndicator } from './BatteryIndicator';
