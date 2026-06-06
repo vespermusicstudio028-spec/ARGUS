@@ -15,21 +15,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (isSupabaseConfigured && supabase && sessionId) {
     try {
-      // Deleting messages triggers cascades or we delete them explicitly
-      await supabase
-        .from('argus_messages')
-        .delete()
-        .eq('session_id', sessionId);
-
+      // Archive session instead of deleting (preserves all history permanently)
       await supabase
         .from('argus_sessions')
-        .delete()
+        .update({ is_archived: true, archived_at: new Date().toISOString() })
         .eq('id', sessionId);
+
+      // Messages remain in database forever - never deleted
+      console.log(`Session ${sessionId} archived. All historical messages preserved.`);
     } catch (e: any) {
       console.error("Supabase Reset Error:", e);
       return res.status(500).json({ error: e.message });
     }
   }
 
-  res.json({ success: true });
+  res.json({ success: true, message: 'Session archived. History preserved.' });
 }
